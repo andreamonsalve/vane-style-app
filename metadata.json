@@ -1,0 +1,7 @@
+{
+  "name": "VaneStyle",
+  "description": "App editorial de asesoría de imagen personal con propósito, liderada por Vane Rondón Atencio.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

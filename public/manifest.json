@@ -1,0 +1,16 @@
+{
+  "name": "Vane Style",
+  "short_name": "VaneStyle",
+  "description": "Tu asesora de imagen e inteligencia artificial.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "192x192 512x512",
+      "type": "image/x-icon"
+    }
+  ]
+}
