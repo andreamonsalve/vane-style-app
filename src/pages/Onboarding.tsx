@@ -43,18 +43,54 @@ export const Onboarding = () => {
   };
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('Fichero seleccionado:', e.target.files?.[0]);
     const file = e.target.files?.[0];
     if (!file) return;
 
     // Create object URL for preview
     const objectUrl = URL.createObjectURL(file);
+    console.log('Preview URL creada:', objectUrl);
     
-    // Read as base64 for API
+    // Resize/Compress and Read as base64 for API
     const reader = new FileReader();
     reader.onload = (event) => {
-      const base64 = (event.target?.result as string).split(',')[1];
-      setSelfie(base64, objectUrl);
+      console.log('FileReader completado');
+      const img = new Image();
+      img.onload = () => {
+        console.log('Imagen cargada en memoria, dimensiones:', img.width, 'x', img.height);
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 800;
+        const MAX_HEIGHT = 800;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+        
+        // Get compressed base64
+        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+        console.log('Base64 comprimido generado');
+        setSelfie(compressedBase64, objectUrl);
+        console.log('Estado de la selfie actualizado en el store');
+      };
+      img.onerror = (err) => console.error('Error cargando imagen en memoria:', err);
+      img.src = event.target?.result as string;
     };
+    reader.onerror = (err) => console.error('Error en FileReader:', err);
     reader.readAsDataURL(file);
   };
 

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { X, Check } from 'lucide-react';
 import { Button } from '@/src/components/ui/Button';
+import { useAuth } from '@/src/contexts/AuthContext';
 
 export const Paywall = () => {
   const navigate = useNavigate();
@@ -61,7 +62,10 @@ export const Paywall = () => {
         <Button 
           fullWidth 
           className="bg-black text-white border-black hover:bg-charcoal"
-          onClick={() => navigate('/')}
+          onClick={async () => {
+            await useAuth().activateTrial?.();
+            navigate('/');
+          }}
         >
           PRUEBA 7 DÍAS GRATIS
         </Button>

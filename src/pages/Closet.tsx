@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Plus, Loader2, X } from 'lucide-react';
+import { Plus, Loader2, X, Lock } from 'lucide-react';
 import { supabase } from '@/src/lib/supabaseClient';
 import { useAuth } from '@/src/contexts/AuthContext';
 import { categorizeClothing } from '@/src/lib/geminiService';
+import { useDiagnosisStore } from '@/src/lib/diagnosisStore';
+import { useNavigate } from 'react-router-dom';
 
 interface ClosetItem {
   id: string;
@@ -15,11 +17,16 @@ interface ClosetItem {
 
 export const Closet = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [items, setItems] = useState<ClosetItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string>('TODO');
+  const isPremium = useDiagnosisStore(state => state.isPremium);
+
+  const ITEM_LIMIT = isPremium ? 20 : 5;
+  const isLimitReached = items.length >= ITEM_LIMIT;
 
   useEffect(() => {
     if (user) fetchItems();
@@ -52,6 +59,11 @@ export const Closet = () => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
 
+    if (isLimitReached) {
+      alert(`Has alcanzado el límite de ${ITEM_LIMIT} prendas para tu plan actual.`);
+      return;
+    }
+
     setUploading(true);
 
     try {
@@ -69,13 +81,13 @@ export const Closet = () => {
       const filePath = `${user.id}/${fileName}`;
 
       const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('closet-images')
+        .from('closet-items')
         .upload(filePath, file);
 
       if (uploadError) throw uploadError;
 
       const { data: { publicUrl } } = supabase.storage
-        .from('closet-images')
+        .from('closet-items')
         .getPublicUrl(filePath);
 
       // 3. Auto-categorize with Gemini AI
@@ -121,7 +133,29 @@ export const Closet = () => {
       />
 
       <header className="px-6 pt-12 mb-8">
-        <h1 className="display-lg">TU CLOSET</h1>
+        <div className="flex justify-between items-end mb-4">
+          <h1 className="display-lg">TU CLOSET</h1>
+          <div className="text-right">
+            <span className="overline-text text-[10px] text-mid-gray block">CAPACIDAD</span>
+            <span className={`font-sans text-[12px] ${isLimitReached ? 'text-error font-medium' : 'text-black'}`}>
+              {items.length} / {ITEM_LIMIT}
+            </span>
+          </div>
+        </div>
+        
+        {!isPremium && isLimitReached && (
+          <div 
+            onClick={() => navigate('/paywall')}
+            className="mb-6 p-4 bg-off-white border border-light-gray flex items-center justify-between cursor-pointer"
+          >
+            <div className="flex items-center gap-3">
+              <Lock className="w-4 h-4 text-black" />
+              <p className="font-sans text-[11px] text-black">Aumentar capacidad a 20 prendas</p>
+            </div>
+            <span className="overline-text text-[10px] text-black underline tracking-wider">UPGRADE</span>
+          </div>
+        )}
+
         <div className="flex gap-4 mt-6 overflow-x-auto no-scrollbar overline-text text-[10px]">
           {categories.map(cat => (
             <button 
@@ -179,13 +213,19 @@ export const Closet = () => {
         </div>
       )}
 
-      <div className="fixed bottom-20 right-6 z-40">
+      <div className="fixed bottom-24 right-6 z-40">
         <button 
-          onClick={() => fileInputRef.current?.click()}
+          onClick={() => {
+            if (isLimitReached) {
+              navigate('/paywall');
+            } else {
+              fileInputRef.current?.click();
+            }
+          }}
           disabled={uploading}
-          className="w-14 h-14 bg-black text-white rounded-full flex items-center justify-center shadow-xl hover:bg-charcoal transition-colors disabled:opacity-50"
+          className={`w-14 h-14 rounded-full flex items-center justify-center shadow-xl transition-colors disabled:opacity-50 ${isLimitReached && !isPremium ? 'bg-mid-gray' : 'bg-black text-white hover:bg-charcoal'}`}
         >
-          <Plus className="w-6 h-6" />
+          {isLimitReached && !isPremium ? <Lock className="w-6 h-6 text-white" /> : <Plus className="w-6 h-6 text-white" />}
         </button>
       </div>
     </div>

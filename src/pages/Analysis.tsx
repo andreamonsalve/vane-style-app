@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Check, ArrowLeft } from 'lucide-react';
+import { Button } from '@/src/components/ui/Button';
 import { cn } from '@/src/lib/utils';
 import { useDiagnosisStore } from '@/src/lib/diagnosisStore';
 import { analyzeFace, analyzeColor } from '@/src/lib/geminiService';
@@ -18,66 +19,100 @@ export const Analysis = () => {
     isAnalyzing, 
     setAnalyzing, 
     analysisStep, 
-    setError 
+    setError,
+    error 
   } = useDiagnosisStore();
+
+  const hasRun = React.useRef(false);
 
   useEffect(() => {
     let mounted = true;
 
     const runAnalysis = async () => {
+      // Evitar doble ejecución en React 18 Strict Mode
+      if (hasRun.current) return;
       if (!selfieBase64) {
         navigate('/onboarding');
         return;
       }
 
-      if (isAnalyzing) return;
-      setAnalyzing(true, 'face');
+      hasRun.current = true;
       setError(null);
+      setAnalyzing(true, 'face');
 
       try {
-        // 1. Face Analysis
+        console.log('Iniciando análisis de IA...');
+        if (!import.meta.env.VITE_GEMINI_API_KEY) {
+          throw new Error('API Key no configurada');
+        }
+
+        // 1. Análisis de Rostro
+        console.log('Paso 1: Analizando rostro...');
         const faceResult = await analyzeFace(selfieBase64);
-        if (!mounted) return;
+        console.log('Resultado de rostro:', faceResult);
+        
+        // Actualizamos store (no importa si desmontado, el store es global)
         setFaceDiagnosis(faceResult);
         
+        // Guardado opcional en Supabase
         if (user) {
-          await supabase.from('face_diagnoses').insert({
+          // Guardar rostro
+          supabase.from('face_diagnoses').insert({
             user_id: user.id,
             face_type: faceResult.faceType,
             features: faceResult.features,
             recommendations: faceResult.recommendations
+          }).then(({ error }) => {
+            if (error) console.warn('Error guardando rostro en DB:', error.message);
           });
+
+          // Guardar objetivo de estilo en perfil
+          if (useDiagnosisStore.getState().styleGoal) {
+            supabase.from('profiles').upsert({
+              id: user.id,
+              style_goal: useDiagnosisStore.getState().styleGoal
+            }).then(({ error }) => {
+              if (error) console.warn('Error guardando estilo en perfil:', error.message);
+            });
+          }
         }
 
-        // 2. Color Analysis
+        // 2. Análisis de Color
+        console.log('Paso 2: Analizando colorimetría...');
         setAnalyzing(true, 'color');
         const colorResult = await analyzeColor(selfieBase64);
-        if (!mounted) return;
+        console.log('Resultado de color:', colorResult);
+        
         setColorDiagnosis(colorResult);
 
         if (user) {
-          await supabase.from('color_diagnoses').insert({
+          supabase.from('color_diagnoses').insert({
             user_id: user.id,
             season: colorResult.season,
             sub_season: colorResult.subSeason,
             palette: colorResult.palette,
             avoid_colors: colorResult.avoidColors,
             symbology: colorResult.symbology
+          }).then(({ error }) => {
+            if (error) console.warn('Error guardando color en DB:', error.message);
           });
         }
 
-        // 3. Mark as done and redirect
+        // 3. Finalización
         setAnalyzing(false, 'done');
+        console.log('Análisis finalizado con éxito');
+        
+        // Navegación forzada a resultados
         setTimeout(() => {
-          if (mounted) navigate('/results');
-        }, 1500);
+          navigate('/results');
+        }, 1000);
 
-      } catch (err) {
-        console.error('Analysis error:', err);
+      } catch (err: any) {
+        console.error('Análisis fallido:', err);
+        hasRun.current = false;
         if (mounted) {
-          setError(err instanceof Error ? err.message : 'Error analyzing photo');
+          setError(err.message || 'Error en la comunicación con la IA');
           setAnalyzing(false, null);
-          navigate('/onboarding');
         }
       }
     };
@@ -109,13 +144,26 @@ export const Analysis = () => {
         </div>
 
         <div className="text-center space-y-2 mb-12">
-          <h1 className="font-display text-[28px] font-light text-black">Analizando con IA</h1>
+          <h1 className="font-display text-[28px] font-light text-black">
+            {error ? 'Error en el análisis' : 'Analizando con IA'}
+          </h1>
           <p className="font-sans text-[12px] text-dark-gray leading-relaxed">
-            Identificando tu tipo de rostro,<br/>facciones y estación de color.
+            {error ? error : (
+              <>Identificando tu tipo de rostro,<br/>facciones y estación de color.</>
+            )}
           </p>
         </div>
 
-        <div className="w-full max-w-[240px] space-y-5">
+        {error && (
+          <div className="w-full max-w-[240px] mt-4">
+            <Button fullWidth onClick={() => navigate('/onboarding')}>
+              REINTENTAR
+            </Button>
+          </div>
+        )}
+
+        {!error && (
+          <div className="w-full max-w-[240px] space-y-5">
           <div className="flex items-center gap-4">
             {analysisStep === 'color' || analysisStep === 'done' ? (
               <div className="w-4 h-4 rounded-full border border-success flex items-center justify-center shrink-0">
@@ -166,7 +214,24 @@ export const Analysis = () => {
               Generando reporte personalizado
             </span>
           </div>
+
+          {analysisStep === 'done' && (
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="pt-4"
+            >
+              <Button 
+                fullWidth 
+                onClick={() => navigate('/results', { replace: true })}
+                className="bg-success hover:bg-success/90 border-success"
+              >
+                VER RESULTADOS
+              </Button>
+            </motion.div>
+          )}
         </div>
+        )}
       </div>
     </div>
   );

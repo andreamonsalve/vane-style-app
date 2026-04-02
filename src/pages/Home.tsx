@@ -4,6 +4,7 @@ import { useNavigate, NavLink } from 'react-router-dom';
 import { useAuth } from '@/src/contexts/AuthContext';
 import { Button } from '@/src/components/ui/Button';
 import { PopupModal } from 'react-calendly';
+import { useDiagnosisStore } from '@/src/lib/diagnosisStore';
 
 const SERVICES = [
   {
@@ -49,6 +50,8 @@ export const Home = () => {
     setIsOpen(true);
   };
 
+  const { faceDiagnosis, colorDiagnosis } = useDiagnosisStore();
+
   if (loading) {
     return <div className="h-screen flex items-center justify-center">Cargando...</div>;
   }
@@ -64,7 +67,7 @@ export const Home = () => {
           className="absolute inset-0 w-full h-full object-cover"
           referrerPolicy="no-referrer"
         />
-        <div className="absolute inset-0 bg-black/40" /> {/* Oscurecido para legibilidad */}
+        <div className="absolute inset-0 bg-black/40" /> 
 
         {/* Contenido Centrado */}
         <motion.div 
@@ -123,20 +126,55 @@ export const Home = () => {
         </p>
       </header>
 
-      {/* Nueva Sección: Onboarding/Diagnóstico (Entry point principal) */}
+      {/* Sección Dinámica: Diagnóstico o Resumen */}
       <section className="px-6 mb-16">
-        <div className="bg-black text-white p-8 text-center space-y-6">
-          <div className="space-y-2">
-            <h3 className="font-display text-[24px] font-light leading-tight">Tu viaje de<br/>estilo comienza aquí</h3>
-            <p className="font-sans text-[13px] text-mid-gray">Realiza tu diagnóstico inicial para que nuestra IA pueda conocerte y armar tu clóset ideal.</p>
+        {(!faceDiagnosis && !colorDiagnosis) ? (
+          <div className="bg-black text-white p-8 text-center space-y-6">
+            <div className="space-y-2">
+              <h3 className="font-display text-[24px] font-light leading-tight">Tu viaje de<br/>estilo comienza aquí</h3>
+              <p className="font-sans text-[13px] text-mid-gray">Realiza tu diagnóstico inicial para que nuestra IA pueda conocerte y armar tu clóset ideal.</p>
+            </div>
+            <Button 
+              onClick={() => navigate('/onboarding')}
+              className="w-full bg-white text-black hover:bg-light-gray border-white"
+            >
+              HACER DIAGNÓSTICO AHORA
+            </Button>
           </div>
-          <Button 
-            onClick={() => navigate('/onboarding')}
-            className="w-full bg-white text-black hover:bg-light-gray border-white"
-          >
-            HACER DIAGNÓSTICO AHORA
-          </Button>
-        </div>
+        ) : (
+          <div className="bg-off-white border border-light-gray p-8 space-y-8">
+            <div className="space-y-1">
+              <span className="overline-text text-mid-gray tracking-[0.2em]">TU PERFIL ACTUAL</span>
+              <h3 className="font-display text-[24px] font-light text-black">Resumen de Diagnóstico</h3>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <span className="overline-text text-[9px] text-mid-gray tracking-[0.15em]">ROSTRO</span>
+                <p className="font-display text-[18px] text-black capitalize">
+                  {faceDiagnosis?.faceType || '...'}
+                </p>
+              </div>
+              <div className="space-y-2">
+                <span className="overline-text text-[9px] text-mid-gray tracking-[0.15em]">COLOR</span>
+                <p className="font-display text-[18px] text-black capitalize">
+                  {colorDiagnosis?.season || '...'}
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-light-gray">
+              <Button 
+                variant="outline"
+                fullWidth 
+                onClick={() => navigate('/results')}
+                className="text-[11px] h-10"
+              >
+                VER DETALLES COMPLETOS
+              </Button>
+            </div>
+          </div>
+        )}
       </section>
 
       <div className="space-y-16">
