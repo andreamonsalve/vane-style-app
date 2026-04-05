@@ -62,26 +62,34 @@ export const Results = () => {
       <div className="space-y-4">
         <div className="relative bg-off-white p-5 overflow-hidden">
           {!isPremium && (
-            <div className="absolute inset-0 bg-white/80 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center">
-              <Lock className="w-5 h-5 text-black mb-2" />
+            <div
+              className="absolute inset-0 bg-white/80 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center"
+              aria-label="Contenido bloqueado — requiere Premium"
+              role="img"
+            >
+              <Lock className="w-5 h-5 text-black mb-2" aria-hidden="true" />
               <span className="overline-text text-black tracking-[0.2em]">PREMIUM</span>
             </div>
           )}
           <span className="overline-text text-black/40 block mb-1">CORTES DE CABELLO</span>
-          <p className="font-sans text-[12px] text-dark-gray">
+          <p className="font-sans text-[12px] text-dark-gray" aria-hidden={!isPremium}>
             {isPremium ? "Tus cortes ideales basados en tu rostro oblongo: Bob con volumen lateral, flequillo cortina o capas largas." : "Según tu rostro y la imagen circular..."}
           </p>
         </div>
 
         <div className="relative bg-off-white p-5 overflow-hidden">
           {!isPremium && (
-            <div className="absolute inset-0 bg-white/80 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center">
-              <Lock className="w-5 h-5 text-black mb-2" />
+            <div
+              className="absolute inset-0 bg-white/80 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center"
+              aria-label="Contenido bloqueado — requiere Premium"
+              role="img"
+            >
+              <Lock className="w-5 h-5 text-black mb-2" aria-hidden="true" />
               <span className="overline-text text-black tracking-[0.2em]">PREMIUM</span>
             </div>
           )}
           <span className="overline-text text-black/40 block mb-1">ACCESORIOS + LENTES</span>
-          <p className="font-sans text-[12px] text-dark-gray">
+          <p className="font-sans text-[12px] text-dark-gray" aria-hidden={!isPremium}>
             {isPremium ? "Lentes recomendados: De formas redondeadas o cuadradas con bordes suaves para equilibrar la verticalidad." : "Formas ideales para tu tipo de rostro..."}
           </p>
         </div>
@@ -90,9 +98,9 @@ export const Results = () => {
       <div className="space-y-4">
         {!isPremium && <Button fullWidth onClick={() => navigate('/paywall')}>DESBLOQUEAR PREMIUM</Button>}
         <div className="text-center">
-          <button 
+          <button
             onClick={() => setView('color')}
-            className="font-sans text-[11px] text-mid-gray tracking-[0.1em] uppercase underline underline-offset-4"
+            className="font-sans text-[11px] text-mid-gray tracking-[0.1em] uppercase underline underline-offset-4 min-h-[44px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
           >
             Continuar con color
           </button>
@@ -120,18 +128,18 @@ export const Results = () => {
       <div className="border-t border-light-gray pt-6 space-y-6">
         <div className="space-y-4">
           <span className="overline-text text-black tracking-[0.15em]">TE FAVORECEN</span>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-3" role="list" aria-label="Colores que te favorecen">
             {(colorDiagnosis?.palette || ['#C17028', '#D4A356', '#8B5E3C', '#BC4B32', '#D67D4A', '#6B7C3F']).map(c => (
-              <div key={c} className="w-8 h-8 rounded-full border border-black/5" style={{ backgroundColor: c }} />
+              <div key={c} role="listitem" className="w-8 h-8 rounded-full border border-black/5" style={{ backgroundColor: c }} aria-label={`Color ${c}`} title={c} />
             ))}
           </div>
         </div>
 
         <div className="space-y-4">
           <span className="overline-text text-black tracking-[0.15em]">EVITAR</span>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-3" role="list" aria-label="Colores a evitar">
             {(colorDiagnosis?.avoidColors || ['#6082B6', '#8E7CC3', '#FF69B4']).map(c => (
-              <div key={c} className="w-8 h-8 rounded-full border border-black/5 opacity-40" style={{ backgroundColor: c }} />
+              <div key={c} role="listitem" className="w-8 h-8 rounded-full border border-black/5 opacity-40" style={{ backgroundColor: c }} aria-label={`Evitar color ${c}`} title={c} />
             ))}
           </div>
         </div>
@@ -139,21 +147,21 @@ export const Results = () => {
 
       <div className="relative bg-off-white p-5 overflow-hidden">
         {!isPremium && (
-          <div className="absolute inset-0 bg-white/80 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center">
-            <Lock className="w-5 h-5 text-black mb-2" />
+          <div className="absolute inset-0 bg-white/80 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center" role="img" aria-label="Contenido bloqueado — requiere Premium">
+            <Lock className="w-5 h-5 text-black mb-2" aria-hidden="true" />
             <span className="overline-text text-black tracking-[0.2em]">PREMIUM</span>
           </div>
         )}
         <span className="overline-text text-black/40 block mb-1">SIMBOLOGÍA DEL COLOR</span>
-        <p className="font-sans text-[12px] text-dark-gray">{colorDiagnosis?.symbology || 'Descubre la psicología de tus colores ideales...'}</p>
+        <p className="font-sans text-[12px] text-dark-gray" aria-hidden={!isPremium}>{colorDiagnosis?.symbology || 'Descubre la psicología de tus colores ideales...'}</p>
       </div>
 
       <div className="space-y-4">
         {!isPremium && <Button fullWidth onClick={() => navigate('/paywall')}>VER DIAGNÓSTICO COMPLETO</Button>}
         <div className="text-center">
-          <button 
+          <button
             onClick={() => setView('summary')}
-            className="font-sans text-[11px] text-mid-gray tracking-[0.1em] uppercase underline underline-offset-4"
+            className="font-sans text-[11px] text-mid-gray tracking-[0.1em] uppercase underline underline-offset-4 min-h-[44px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
           >
             Siguiente: Resumen de Perfil
           </button>
@@ -247,20 +255,20 @@ export const Results = () => {
     <div className="min-h-screen bg-white">
       {/* Header with Back Button */}
       <div className="px-6 pt-6 pb-2 flex items-center">
-        <button 
+        <button
           onClick={handleBack}
-          className="p-2 -ml-2 hover:bg-off-white transition-colors"
+          className="p-2 -ml-2 min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-off-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
           aria-label="Volver"
         >
-          <ArrowLeft className="w-5 h-5 text-black" />
+          <ArrowLeft className="w-5 h-5 text-black" aria-hidden="true" />
         </button>
       </div>
 
       <div className="px-6 pt-4 pb-24">
         {loading && (!faceDiagnosis || !colorDiagnosis) ? (
-          <div className="flex flex-col items-center justify-center p-12 space-y-4">
-            <div className="w-10 h-10 border-2 border-black border-t-transparent rounded-full animate-spin" />
-            <p className="font-sans text-[12px] text-mid-gray animate-pulse">Sincronizando diagnóstico...</p>
+          <div className="flex flex-col items-center justify-center p-12 space-y-4" role="status" aria-label="Sincronizando diagnóstico">
+            <div className="w-10 h-10 border-2 border-black border-t-transparent rounded-full animate-spin" aria-hidden="true" />
+            <p className="font-sans text-[12px] text-mid-gray">Sincronizando diagnóstico...</p>
           </div>
         ) : (
           <AnimatePresence mode="wait">

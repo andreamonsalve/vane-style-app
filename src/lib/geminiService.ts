@@ -10,14 +10,17 @@ async function getBestAvailableModel(): Promise<string> {
       throw new Error('No se encontraron modelos disponibles en tu proyecto de Google Cloud.');
     }
 
-    // Priorizamos nombres que contengan '1.5-flash'
-    const bestModel = data.models.find((m: any) => 
-      m.name.includes('gemini-1.5-flash') && m.supportedGenerationMethods.includes('generateContent')
-    );
-
-    if (bestModel) {
-      console.log(`[Smart Connect] Modelo óptimo encontrado: ${bestModel.name}`);
-      return bestModel.name;
+    // Prioridad: gemini-2.5-flash > gemini-1.5-flash > cualquier modelo con generateContent
+    const preferredModels = ['gemini-2.5-flash', 'gemini-1.5-flash'];
+    
+    for (const preferred of preferredModels) {
+      const found = data.models.find((m: any) =>
+        m.name.includes(preferred) && m.supportedGenerationMethods.includes('generateContent')
+      );
+      if (found) {
+        console.log(`[Smart Connect] Modelo óptimo encontrado: ${found.name}`);
+        return found.name;
+      }
     }
 
     // Si no, el primero que permita generar contenido
@@ -30,7 +33,7 @@ async function getBestAvailableModel(): Promise<string> {
     throw new Error('Ninguno de tus modelos disponibles soporta generación de contenido.');
   } catch (e: any) {
     console.error('[Smart Connect] Error al detectar modelos:', e.message);
-    // Si falla la detección, intentamos el nombre estándar como último recurso
+    // Si falla la detección, usamos gemini-1.5-flash como respaldo seguro
     return 'models/gemini-1.5-flash';
   }
 }
@@ -176,6 +179,117 @@ export async function categorizeClothing(imageBase64: string): Promise<ClothingC
   const start = cleaned.indexOf('{');
   const end = cleaned.lastIndexOf('}');
   return JSON.parse(cleaned.substring(start, end + 1)) as ClothingCategory;
+}
+
+// ─── OUTFIT GENERATION ───────────────────────────────────
+export interface OutfitSuggestion {
+  name: string;
+  itemIds: string[];
+  reasoning: string;
+  matchScore: number;
+  missingItem?: { category: string; description: string };
+}
+
+function createFallbackSuggestions(
+  anchor: { id: string; name: string; color: string },
+  items: Array<{ id: string; name: string; category: string; color: string }>,
+  occasion: string
+): OutfitSuggestion[] {
+  const bottoms = items.filter(i =>
+    ['pantalón', 'falda', 'jeans', 'jean', 'bottom', 'skirt', 'pants'].some(k =>
+      i.category?.toLowerCase().includes(k) || i.name?.toLowerCase().includes(k)
+    )
+  );
+  const shoes = items.filter(i =>
+    ['zapato', 'zapatilla', 'bota', 'shoe', 'boot', 'tenis', 'calzado', 'tacón'].some(k =>
+      i.category?.toLowerCase().includes(k) || i.name?.toLowerCase().includes(k)
+    )
+  );
+  const others = items.filter(i => !bottoms.includes(i) && !shoes.includes(i));
+
+  const suggestions: OutfitSuggestion[] = [];
+
+  const pool1 = [...(bottoms.slice(0, 1)), ...(shoes.slice(0, 1))];
+  if (pool1.length > 0) {
+    suggestions.push({
+      name: 'Look clásico',
+      itemIds: pool1.map(i => i.id),
+      reasoning: `La combinación de ${anchor.color} con estas prendas crea un look equilibrado para ${occasion}.`,
+      matchScore: 84,
+    });
+  }
+
+  const pool2 = [...(bottoms.slice(1, 2)), ...(shoes.slice(1, 2)), ...(others.slice(0, 1))];
+  if (pool2.length > 0) {
+    suggestions.push({
+      name: 'Look alternativo',
+      itemIds: pool2.map(i => i.id),
+      reasoning: 'Una combinación diferente que mantiene coherencia con tu paleta.',
+      matchScore: 78,
+    });
+  }
+
+  const pool3 = [...(others.slice(1, 2)), ...(bottoms.slice(2, 3)), ...(shoes.slice(2, 3))];
+  const fallbackPool = pool3.length > 0 ? pool3 : items.slice(0, 2);
+  if (suggestions.length < 3) {
+    suggestions.push({
+      name: 'Look casual',
+      itemIds: fallbackPool.map(i => i.id),
+      reasoning: 'Una opción relajada que funciona para el día a día.',
+      matchScore: 72,
+    });
+  }
+
+  return suggestions.slice(0, 3);
+}
+
+export async function generateOutfits(
+  anchorItem: { id: string; name: string; category: string; color: string },
+  otherItems: Array<{ id: string; name: string; category: string; color: string }>,
+  occasion: string,
+  diagnosis: { faceType?: string; colorSeason?: string; palette?: string[] }
+): Promise<OutfitSuggestion[]> {
+  const itemsList = otherItems
+    .map(i => `ID:${i.id} | ${i.name} | ${i.category} | Color: ${i.color}`)
+    .join('\n');
+
+  const paletteStr = diagnosis.palette?.slice(0, 6).join(', ') || 'no definida';
+
+  const prompt = `Eres Vane, asesora de imagen personal experta en estilismo y colorimetría.
+
+PRENDA ANCLA (siempre incluida en todos los outfits):
+ID:${anchorItem.id} | ${anchorItem.name} | ${anchorItem.category} | Color: ${anchorItem.color}
+
+OTRAS PRENDAS DEL CLOSET (SOLO usa estas):
+${itemsList || 'Sin otras prendas disponibles'}
+
+OCASIÓN: ${occasion}
+TEMPORADA DE COLOR: ${diagnosis.colorSeason || 'no definida'}
+PALETA: ${paletteStr}
+
+REGLAS:
+- itemIds = solo IDs de prendas ADICIONALES (no incluir el ID de la ancla)
+- Máximo 2 prendas adicionales por outfit
+- 3 combinaciones claramente diferentes
+- matchScore entre 70-99 según armonía de colores
+- nombres cortos en español (2-3 palabras)
+- reasoning: 1-2 oraciones directas y seguras, como lo diría Vane
+
+Responde ÚNICAMENTE con JSON válido, sin markdown, sin texto extra:
+[{"name":"Look X","itemIds":["id1","id2"],"reasoning":"texto directo","matchScore":95,"missingItem":{"category":"bolso","description":"Un bolso estructurado completaría el look"}}]`;
+
+  try {
+    const text = await callGeminiREST(prompt);
+    const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const start = cleaned.indexOf('[');
+    const end = cleaned.lastIndexOf(']');
+    if (start === -1 || end === -1) throw new Error('No JSON array found');
+    const parsed = JSON.parse(cleaned.substring(start, end + 1)) as OutfitSuggestion[];
+    return parsed.slice(0, 3);
+  } catch (error) {
+    console.warn('[generateOutfits] AI failed, using fallback:', error);
+    return createFallbackSuggestions(anchorItem, otherItems, occasion);
+  }
 }
 
 // ─── CHATBOT ─────────────────────────────────────────────

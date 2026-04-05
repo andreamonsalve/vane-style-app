@@ -43,21 +43,17 @@ export const Onboarding = () => {
   };
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('Fichero seleccionado:', e.target.files?.[0]);
     const file = e.target.files?.[0];
     if (!file) return;
 
     // Create object URL for preview
     const objectUrl = URL.createObjectURL(file);
-    console.log('Preview URL creada:', objectUrl);
     
     // Resize/Compress and Read as base64 for API
     const reader = new FileReader();
     reader.onload = (event) => {
-      console.log('FileReader completado');
       const img = new Image();
       img.onload = () => {
-        console.log('Imagen cargada en memoria, dimensiones:', img.width, 'x', img.height);
         const canvas = document.createElement('canvas');
         const MAX_WIDTH = 800;
         const MAX_HEIGHT = 800;
@@ -83,14 +79,12 @@ export const Onboarding = () => {
         
         // Get compressed base64
         const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
-        console.log('Base64 comprimido generado');
         setSelfie(compressedBase64, objectUrl);
-        console.log('Estado de la selfie actualizado en el store');
       };
-      img.onerror = (err) => console.error('Error cargando imagen en memoria:', err);
+      img.onerror = () => {};
       img.src = event.target?.result as string;
     };
-    reader.onerror = (err) => console.error('Error en FileReader:', err);
+    reader.onerror = () => {};
     reader.readAsDataURL(file);
   };
 
@@ -112,30 +106,42 @@ export const Onboarding = () => {
   return (
     <div className="h-screen flex flex-col bg-white">
       {/* Hidden file input */}
-      <input 
-        type="file" 
-        accept="image/*" 
-        ref={fileInputRef} 
-        onChange={onFileChange} 
-        className="hidden" 
+      <input
+        type="file"
+        accept="image/*"
+        ref={fileInputRef}
+        onChange={onFileChange}
+        className="hidden"
+        aria-label="Seleccionar imagen de la galería"
       />
 
       {/* Header with Back Button */}
-      <div className="px-6 pt-6 pb-2 flex items-center">
-        <button 
+      <div className="px-6 pt-6 pb-2 flex items-center justify-between">
+        <button
           onClick={handleBack}
-          className="p-2 -ml-2 hover:bg-off-white transition-colors"
-          aria-label="Volver"
+          className="p-2 -ml-2 min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-off-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+          aria-label={step === 1 ? 'Volver al inicio' : 'Volver al quiz'}
         >
-          <ArrowLeft className="w-5 h-5 text-black" />
+          <ArrowLeft className="w-5 h-5 text-black" aria-hidden="true" />
         </button>
+        <span className="overline-text text-[10px] text-mid-gray" aria-live="polite">
+          {step} / 2
+        </span>
       </div>
 
       {/* Progress Bar */}
-      <div className="h-[1px] w-full bg-light-gray">
-        <motion.div 
+      <div
+        className="h-[1px] w-full bg-light-gray"
+        role="progressbar"
+        aria-valuenow={step === 1 ? 33 : 66}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label={`Paso ${step} de 2`}
+      >
+        <motion.div
           initial={{ width: 0 }}
           animate={{ width: step === 1 ? '33%' : '66%' }}
+          transition={{ duration: 0.3, ease: 'easeOut' }}
           className="h-full bg-black"
         />
       </div>
@@ -157,20 +163,26 @@ export const Onboarding = () => {
               </p>
             </div>
 
-            <div className="space-y-0 border-t border-light-gray">
+            <div
+              role="radiogroup"
+              aria-label="Imagen que sientes que proyectas hoy"
+              className="space-y-0 border-t border-light-gray"
+            >
               {quizOptions.map((opt, i) => (
                 <button
                   key={i}
+                  role="radio"
+                  aria-checked={selectedOption === i}
                   onClick={() => setSelectedOption(i)}
                   className={cn(
-                    "w-full flex items-center gap-4 py-5 border-b border-light-gray transition-colors text-left",
+                    "w-full flex items-center gap-4 py-5 border-b border-light-gray transition-colors text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-black",
                     selectedOption === i && "bg-off-white"
                   )}
                 >
                   <div className={cn(
-                    "w-4 h-4 rounded-full border border-mid-gray flex items-center justify-center shrink-0",
-                    selectedOption === i && "border-black bg-black"
-                  )}>
+                    "w-4 h-4 rounded-full border flex items-center justify-center shrink-0 transition-colors",
+                    selectedOption === i ? "border-black bg-black" : "border-mid-gray"
+                  )} aria-hidden="true">
                     {selectedOption === i && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
                   </div>
                   <div>
@@ -196,20 +208,21 @@ export const Onboarding = () => {
             </div>
 
             <div className="flex justify-center">
-              <button 
+              <button
                 onClick={triggerCamera}
-                className="w-48 h-48 rounded-full border border-mid-gray flex items-center justify-center relative overflow-hidden group hover:border-black transition-colors"
+                aria-label={selfiePreviewUrl ? 'Cambiar selfie — tomar nueva foto' : 'Tomar selfie con la cámara'}
+                className="w-48 h-48 rounded-full border border-mid-gray flex items-center justify-center relative overflow-hidden group hover:border-black transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
               >
                 {selfiePreviewUrl ? (
-                  <img src={selfiePreviewUrl} alt="Selfie preview" className="w-full h-full object-cover" />
+                  <img src={selfiePreviewUrl} alt="Tu selfie cargada" className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-32 h-32 rounded-full bg-light-gray flex items-center justify-center group-hover:bg-off-white transition-colors">
-                    <Camera className="w-8 h-8 text-mid-gray group-hover:text-black transition-colors" />
+                    <Camera className="w-8 h-8 text-mid-gray group-hover:text-black transition-colors" aria-hidden="true" />
                   </div>
                 )}
-                
+
                 {selfiePreviewUrl && (
-                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true">
                     <Camera className="w-8 h-8 text-white" />
                   </div>
                 )}

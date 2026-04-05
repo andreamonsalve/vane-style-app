@@ -65,15 +65,15 @@ export const Login = () => {
   return (
     <div className="h-screen flex flex-col bg-white">
       {/* Hero Image */}
-      <section className="relative h-[45vh] min-h-[300px] overflow-hidden">
+      <section className="relative h-[45vh] min-h-[300px] overflow-hidden" aria-hidden="true">
         <img
           src="/images/registro-banner.png"
-          alt="Login Banner Vane Style"
+          alt=""
+          role="presentation"
           className="absolute inset-0 w-full h-full object-cover"
           referrerPolicy="no-referrer"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-white" />
-
       </section>
 
       {/* Auth Section */}
@@ -89,9 +89,9 @@ export const Login = () => {
               className="flex-1 flex flex-col justify-between"
             >
               <div className="space-y-2">
-                <h2 className="font-display text-[28px] font-light text-black leading-tight">
+                <h1 className="font-display text-[28px] font-light text-black leading-tight">
                   Viste con<br />propósito.
-                </h2>
+                </h1>
                 <p className="font-sans text-[13px] text-dark-gray leading-relaxed max-w-[280px]">
                   Tu asesora de imagen personal. Diagnóstico con IA, closet inteligente, outfits con lo que ya tienes.
                 </p>
@@ -104,8 +104,8 @@ export const Login = () => {
                 <Button fullWidth variant="secondary" onClick={() => setMode('login')}>
                   INICIAR SESIÓN
                 </Button>
-                <div className="relative my-4">
-                  <div className="absolute inset-0 flex items-center">
+                <div className="relative my-4" role="separator" aria-label="O continúa con">
+                  <div className="absolute inset-0 flex items-center" aria-hidden="true">
                     <div className="w-full border-t border-light-gray" />
                   </div>
                   <div className="relative flex justify-center">
@@ -116,9 +116,10 @@ export const Login = () => {
                 </div>
                 <button
                   onClick={handleGoogleLogin}
-                  className="w-full flex items-center justify-center gap-3 py-3 border border-light-gray hover:border-black transition-colors duration-200"
+                  aria-label="Iniciar sesión con Google"
+                  className="w-full flex items-center justify-center gap-3 py-3 min-h-[44px] border border-light-gray hover:border-black transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
                 >
-                  <svg className="w-4 h-4" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" aria-hidden="true">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />
                     <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
                     <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
@@ -144,99 +145,108 @@ export const Login = () => {
               {/* Back button */}
               <button
                 onClick={() => { setMode('welcome'); setError(''); setSuccessMessage(''); }}
-                className="flex items-center gap-2 mb-6 text-charcoal"
+                aria-label="Volver al inicio"
+                className="flex items-center gap-2 mb-6 text-charcoal min-h-[44px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
               >
-                <ArrowLeft size={16} strokeWidth={1.5} />
+                <ArrowLeft size={16} strokeWidth={1.5} aria-hidden="true" />
                 <span className="font-sans text-[11px] tracking-[0.1em] uppercase">Volver</span>
               </button>
 
-              <h2 className="font-display text-[28px] font-light text-black leading-tight mb-6">
-                {mode === 'login' ? 'Bienvenida\nde vuelta.' : 'Crea tu\ncuenta.'}
-              </h2>
+              <h1 className="font-display text-[28px] font-light text-black leading-tight mb-6">
+                {mode === 'login' ? <>Bienvenida<br/>de vuelta.</> : <>Crea tu<br/>cuenta.</>}
+              </h1>
 
-              <form onSubmit={handleSubmit} className="flex-1 flex flex-col justify-between">
+              <form onSubmit={handleSubmit} className="flex-1 flex flex-col justify-between" noValidate>
                 <div className="space-y-4">
                   {mode === 'signup' && (
                     <div>
-                      <label className="overline-text text-dark-gray block mb-2">
+                      <label htmlFor="fullName" className="overline-text text-dark-gray block mb-2">
                         NOMBRE COMPLETO
                       </label>
                       <input
+                        id="fullName"
                         type="text"
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
                         className="w-full border-b border-light-gray py-3 font-sans text-[14px] text-black focus:border-black focus:outline-none transition-colors bg-transparent"
                         placeholder="María García"
+                        autoComplete="name"
                         required
                       />
                     </div>
                   )}
 
                   <div>
-                    <label className="overline-text text-dark-gray block mb-2">
+                    <label htmlFor="email" className="overline-text text-dark-gray block mb-2">
                       EMAIL
                     </label>
                     <input
+                      id="email"
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="w-full border-b border-light-gray py-3 font-sans text-[14px] text-black focus:border-black focus:outline-none transition-colors bg-transparent"
                       placeholder="tu@email.com"
+                      autoComplete={mode === 'login' ? 'username' : 'email'}
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="overline-text text-dark-gray block mb-2">
+                    <label htmlFor="password" className="overline-text text-dark-gray block mb-2">
                       CONTRASEÑA
                     </label>
                     <div className="relative">
                       <input
+                        id="password"
                         type={showPassword ? 'text' : 'password'}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         className="w-full border-b border-light-gray py-3 font-sans text-[14px] text-black focus:border-black focus:outline-none transition-colors bg-transparent pr-10"
                         placeholder="Mínimo 6 caracteres"
+                        autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
                         minLength={6}
                         required
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-0 top-1/2 -translate-y-1/2 p-2 text-mid-gray hover:text-black transition-colors"
+                        aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                        className="absolute right-0 top-1/2 -translate-y-1/2 p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-mid-gray hover:text-black transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-black"
                       >
-                        {showPassword ? <EyeOff size={16} strokeWidth={1.5} /> : <Eye size={16} strokeWidth={1.5} />}
+                        {showPassword ? <EyeOff size={16} strokeWidth={1.5} aria-hidden="true" /> : <Eye size={16} strokeWidth={1.5} aria-hidden="true" />}
                       </button>
                     </div>
                   </div>
 
-                  {/* Error message */}
-                  {error && (
-                    <motion.p
-                      initial={{ opacity: 0, y: -5 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="font-sans text-[12px] text-error"
-                    >
-                      {error}
-                    </motion.p>
-                  )}
-
-                  {/* Success message */}
-                  {successMessage && (
-                    <motion.p
-                      initial={{ opacity: 0, y: -5 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="font-sans text-[12px] text-success"
-                    >
-                      {successMessage}
-                    </motion.p>
-                  )}
+                  {/* Error/Success messages — aria-live so screen readers announce them */}
+                  <div aria-live="polite" aria-atomic="true">
+                    {error && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        role="alert"
+                        className="font-sans text-[12px] text-error"
+                      >
+                        {error}
+                      </motion.p>
+                    )}
+                    {successMessage && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="font-sans text-[12px] text-success"
+                      >
+                        {successMessage}
+                      </motion.p>
+                    )}
+                  </div>
                 </div>
 
                 <div className="space-y-4 mt-8">
-                  <Button fullWidth type="submit" disabled={loading}>
-                    {loading 
-                      ? 'PROCESANDO...' 
+                  <Button fullWidth type="submit" disabled={loading} aria-busy={loading}>
+                    {loading
+                      ? <span className="flex items-center gap-2"><span className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" aria-hidden="true" />PROCESANDO...</span>
                       : mode === 'login' ? 'INICIAR SESIÓN' : 'CREAR CUENTA'
                     }
                   </Button>
@@ -248,7 +258,7 @@ export const Login = () => {
                         setError('');
                         setSuccessMessage('');
                       }}
-                      className="font-sans text-[11px] text-mid-gray tracking-[0.1em] uppercase underline underline-offset-4"
+                      className="font-sans text-[11px] text-mid-gray tracking-[0.1em] uppercase underline underline-offset-4 min-h-[44px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
                     >
                       {mode === 'login' ? '¿NO TIENES CUENTA? REGÍSTRATE' : '¿YA TIENES CUENTA? INICIA SESIÓN'}
                     </button>

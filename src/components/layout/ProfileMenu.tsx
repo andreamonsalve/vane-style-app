@@ -30,26 +30,33 @@ export const ProfileMenu = ({ isOpen, onClose }: ProfileMenuProps) => {
   };
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="fixed inset-0 bg-black/40 z-[60] backdrop-blur-sm"
-          />
-          
-          {/* Drawer */}
-          <motion.div
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed top-0 right-0 bottom-0 w-[85%] max-w-[400px] bg-white z-[70] shadow-2xl flex flex-col"
+    <>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div 
+            key="profile-menu-container"
+            className="fixed inset-0 z-[60]"
           >
+            {/* Backdrop */}
+            <motion.div
+              key="backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={onClose}
+              className="absolute inset-0 bg-black/40"
+            />
+
+            {/* Drawer */}
+            <motion.div
+              key="drawer"
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="absolute top-0 right-0 bottom-0 w-[85%] max-w-[400px] bg-white shadow-2xl flex flex-col z-10"
+            >
             {/* Header */}
             <div className="flex justify-between items-center p-6 border-b border-light-gray">
               <span className="overline-text text-black">TU PERFIL</span>
@@ -140,8 +147,9 @@ export const ProfileMenu = ({ isOpen, onClose }: ProfileMenuProps) => {
             </div>
             
           </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 };

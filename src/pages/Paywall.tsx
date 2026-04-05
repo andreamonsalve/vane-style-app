@@ -7,12 +7,17 @@ import { useAuth } from '@/src/contexts/AuthContext';
 
 export const Paywall = () => {
   const navigate = useNavigate();
+  const { activateTrial } = useAuth();
 
   return (
     <div className="min-h-screen bg-white px-6 pt-8 pb-12 flex flex-col">
       <div className="flex justify-end">
-        <button onClick={() => navigate('/')} className="p-2">
-          <X className="w-6 h-6 text-mid-gray" />
+        <button
+          onClick={() => navigate('/')}
+          aria-label="Cerrar y volver al inicio"
+          className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-off-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+        >
+          <X className="w-6 h-6 text-mid-gray" aria-hidden="true" />
         </button>
       </div>
 
@@ -25,14 +30,14 @@ export const Paywall = () => {
         </p>
       </div>
 
-      <div className="flex gap-[1px] bg-light-gray border border-light-gray mb-12">
-        <div className="flex-1 bg-white p-6 text-center space-y-2">
+      <div role="radiogroup" aria-label="Selecciona tu plan" className="flex gap-[1px] bg-light-gray border border-light-gray mb-12">
+        <div className="flex-1 bg-white p-6 text-center space-y-2" role="radio" aria-checked="false" aria-label="Plan mensual — 9.99 dólares por mes">
           <span className="overline-text text-[9px] text-mid-gray tracking-[0.15em]">MENSUAL</span>
           <p className="font-display text-[32px] text-black leading-none">$9.99</p>
           <p className="font-sans text-[11px] text-mid-gray">/mes</p>
         </div>
-        <div className="flex-1 bg-white p-6 text-center space-y-2 relative border border-black">
-          <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-black text-white px-3 py-1 overline-text text-[8px] tracking-[0.2em] whitespace-nowrap">
+        <div className="flex-1 bg-white p-6 text-center space-y-2 relative border border-black" role="radio" aria-checked="true" aria-label="Plan anual — 6.66 dólares por mes, ahorra 33%">
+          <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-black text-white px-3 py-1 overline-text text-[8px] tracking-[0.2em] whitespace-nowrap" aria-hidden="true">
             AHORRA 33%
           </div>
           <span className="overline-text text-[9px] text-mid-gray tracking-[0.15em] mt-2 block">ANUAL</span>
@@ -41,7 +46,7 @@ export const Paywall = () => {
         </div>
       </div>
 
-      <div className="space-y-4 flex-1">
+      <ul className="space-y-4 flex-1" aria-label="Qué incluye Premium">
         {[
           'Diagnóstico completo + simbología',
           'Closet virtual ilimitado',
@@ -49,21 +54,21 @@ export const Paywall = () => {
           'Comunidad + swap entre usuarias',
           'Mensaje diario de Vane'
         ].map(f => (
-          <div key={f} className="flex items-center gap-4 py-3 border-b border-light-gray last:border-0">
-            <div className="w-4 h-4 rounded-full border border-success flex items-center justify-center">
+          <li key={f} className="flex items-center gap-4 py-3 border-b border-light-gray last:border-0">
+            <div className="w-4 h-4 rounded-full border border-success flex items-center justify-center shrink-0" aria-hidden="true">
               <Check className="w-2.5 h-2.5 text-success" />
             </div>
             <span className="font-sans text-[13px] text-charcoal">{f}</span>
-          </div>
+          </li>
         ))}
-      </div>
+      </ul>
 
       <div className="mt-12 space-y-4">
-        <Button 
-          fullWidth 
+        <Button
+          fullWidth
           className="bg-black text-white border-black hover:bg-charcoal"
           onClick={async () => {
-            await useAuth().activateTrial?.();
+            await activateTrial?.();
             navigate('/');
           }}
         >
