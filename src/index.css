@@ -5,22 +5,22 @@
   --font-display: "Cormorant Garamond", serif;
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 
-  --color-white: #FFFFFF;
-  --color-off-white: #FAFAFA;
-  --color-light-gray: #F2F2F2;
-  --color-mid-gray: #B0B0B0;
-  --color-dark-gray: #6B6B6B;
-  --color-charcoal: #1D1D1B;
-  --color-black: #000000;
+  --color-white: var(--white);
+  --color-off-white: var(--off-white);
+  --color-light-gray: var(--gray-100);
+  --color-mid-gray: var(--gray-400);
+  --color-dark-gray: var(--gray-600);
+  --color-charcoal: var(--near-black);
+  --color-black: var(--black);
 
-  --color-vane: #CDBCDC;
-  --color-vane-light: #E8DCEF;
-  --color-vane-dark: #A896C4;
-  --color-vane-bg: #F5F0FA;
+  --color-vane: var(--vane);
+  --color-vane-light: var(--vane-light);
+  --color-vane-dark: var(--vane-dark);
+  --color-vane-bg: var(--vane-bg);
 
-  --color-success: #2D8B4E;
-  --color-warning: #C4841D;
-  --color-error: #C43333;
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
 }
 
 @layer base {
@@ -94,8 +94,64 @@
 }
 
 
-/* === VANE STYLE V3 CLASSES === */
+/* === V3 ROOT VARIABLES === */
+:root {
+  /* COLORES BASE */
+  --white: #FFFFFF;
+  --off-white: #FAFAFA;
+  --gray-100: #F2F2F2;
+  --gray-300: #E0E0E0;
+  --gray-400: #B0B0B0;
+  --gray-600: #6B6B6B;
+  --near-black: #1D1D1B;
+  --black: #000000;
 
+  /* ACENTO VANE — LAVANDA */
+  --vane: #CDBCDC;
+  --vane-light: #E8DCEF;
+  --vane-dark: #A896C4;
+  --vane-bg: #F5F0FA;
+  --vane-text: #1D1D1B;  /* texto sobre lavanda */
+
+  /* FUNCIONALES */
+  --error: #C43333;
+  --success: #2D8B4E;
+  --warning: #C4841D;
+
+  /* FUENTES */
+  --font-display: 'Helvetica Neue', Arial, 'Arial Black', sans-serif;
+  --font-script: 'Cormorant Garamond', Georgia, serif;
+  --font-ui: 'Helvetica Neue', -apple-system, Arial, sans-serif;
+
+  /* SPACING */
+  --sp-xs: 4px;
+  --sp-sm: 8px;
+  --sp-md: 16px;
+  --sp-lg: 24px;
+  --sp-xl: 40px;
+  --sp-2xl: 64px;
+
+  /* BORDERS */
+  --border-subtle: 0.5px solid var(--gray-300);
+  --border-default: 1px solid var(--near-black);
+  --border-strong: 1.5px solid var(--near-black);
+
+  /* RADIUS */
+  --radius-none: 0px;
+  --radius-sm: 4px;
+  --radius-pill: 999px;
+
+  /* SHADOWS */
+  --shadow-card: 0 2px 8px rgba(0,0,0,0.06);
+  --shadow-modal: 0 8px 32px rgba(0,0,0,0.12);
+  --shadow-float: 0 4px 16px rgba(0,0,0,0.25);
+
+  /* TRANSITIONS */
+  --t-fast: 0.15s ease;
+  --t-med: 0.25s ease-out;
+}
+
+/* === V3 COMPONENT UTILITIES === */
 /* ---- BASE PILL BUTTON ---- */
 .btn {
   display: inline-flex;
