@@ -24,7 +24,7 @@ const PageWrapper = ({ children }: { children: React.ReactNode }) => {
   return (
     <>
       {!hideNavigation && <Header />}
-      <main className={`flex-1 overflow-y-auto no-scrollbar ${!hideNavigation ? 'pt-16 pb-20' : ''}`}>
+      <main className={`flex-1 flex flex-col overflow-y-auto no-scrollbar ${!hideNavigation ? 'pt-16 pb-20' : ''}`}>
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}
@@ -32,7 +32,7 @@ const PageWrapper = ({ children }: { children: React.ReactNode }) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="min-h-full"
+            className="flex-1 flex flex-col"
           >
             {children}
           </motion.div>

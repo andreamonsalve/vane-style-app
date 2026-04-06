@@ -236,7 +236,7 @@ export const Home = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3, ease: 'easeOut' }}
-        className="h-full w-full relative flex flex-col items-center justify-center overflow-hidden px-6"
+        className="flex-1 w-full relative flex flex-col items-center justify-center overflow-hidden px-6"
       >
         <img src="/images/home-banner.png" alt="" role="presentation"
           className="absolute inset-0 w-full h-full object-cover" referrerPolicy="no-referrer" />
@@ -258,7 +258,7 @@ export const Home = () => {
             </Button>
             <button
               onClick={() => navigate('/login')}
-              className="w-full font-sans text-[11px] text-white/80 tracking-[0.1em] uppercase hover:text-white transition-colors duration-150 py-3 min-h-[44px] border border-white/30 hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              className="btn border border-white/30 text-white w-full hover:bg-white/10 uppercase tracking-[0.1em]"
             >
               YA TENGO CUENTA
             </button>
