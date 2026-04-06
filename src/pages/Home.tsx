@@ -325,17 +325,17 @@ export const Home = () => {
           <motion.button
             initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.14 }}
             onClick={() => navigate('/chat')}
-            className="w-full text-left bg-black p-5 space-y-3 active:opacity-80 transition-opacity"
+            className="w-[calc(100%+48px)] -ml-6 px-6 text-left bg-[#CDBCDC] py-6 space-y-3 active:opacity-80 transition-opacity"
           >
             <div>
-              <p className="overline-text text-[9px] text-white/50 tracking-[0.2em] mb-1">DIAGNÓSTICO EMOCIONAL</p>
-              <h2 className="font-display text-[20px] font-light text-white leading-tight">Entiéndete mejor.</h2>
+              <p className="overline-text text-[10px] text-black tracking-[0.15em] mb-1">DIAGNÓSTICO EMOCIONAL</p>
+              <h2 className="font-display text-[20px] font-medium text-black leading-tight">Entiéndete mejor.</h2>
             </div>
-            <p className="font-sans text-[12px] text-white/70 leading-relaxed">
+            <p className="font-sans text-[12px] text-dark-gray leading-relaxed">
               Explora tu relación psicológica con la imagen a través de nuestro chatbot entrenado por Vane.
             </p>
-            <div className="border border-white/40 py-2 text-center">
-              <span className="font-sans text-[10px] font-medium tracking-[0.12em] text-white uppercase">
+            <div className="border border-black/40 py-2 text-center mt-2 flex justify-center items-center">
+              <span className="font-sans text-[10px] font-bold tracking-[0.12em] text-black uppercase">
                 INICIAR CHAT CON VANE
               </span>
             </div>
@@ -472,31 +472,32 @@ export const Home = () => {
           {/* Diagnóstico Emocional con cuota */}
           <motion.div
             initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.18 }}
-            className="bg-black p-5 space-y-3"
+            className="w-[calc(100%+48px)] -ml-6 px-6 bg-[#CDBCDC] py-6 space-y-4"
           >
             <div>
-              <p className="overline-text text-[9px] text-white/50 tracking-[0.2em] mb-1">DIAGNÓSTICO EMOCIONAL</p>
-              <p className="font-sans text-[12px] text-white/70 leading-relaxed">
+              <p className="overline-text text-[10px] text-black tracking-[0.15em] mb-1">DIAGNÓSTICO EMOCIONAL</p>
+              <p className="font-sans text-[12px] text-dark-gray leading-relaxed">
                 Desbloquea autoconocimiento. {MONTHLY_SESSION_LIMIT} sesiones/mes en plan free.
               </p>
             </div>
             <div className="flex items-center gap-3">
               <Button
+                variant="primary"
                 fullWidth
                 disabled={quotaExhausted}
                 onClick={() => !quotaExhausted && navigate('/chat')}
-                className={`bg-white text-black hover:bg-light-gray border-white ${quotaExhausted ? 'opacity-40 cursor-not-allowed' : ''}`}
+                className={quotaExhausted ? 'opacity-40' : ''}
               >
                 INICIAR CHAT CON VANE
               </Button>
-              <span className="font-sans text-[8px] tracking-[0.12em] uppercase text-white/50 border border-white/20 px-2 py-2 whitespace-nowrap flex-shrink-0">
+              <span className="font-sans text-[8px] font-bold tracking-[0.12em] uppercase text-black border border-black/30 px-3 py-3 rounded-md whitespace-nowrap flex-shrink-0">
                 {emotionalSessionsUsed}/{MONTHLY_SESSION_LIMIT} USOS
               </span>
             </div>
             {quotaExhausted && (
               <button
                 onClick={() => navigate('/paywall')}
-                className="w-full font-sans text-[10px] tracking-[0.1em] uppercase text-white/70 underline underline-offset-2 text-center pt-1"
+                className="w-full font-sans text-[10px] tracking-[0.1em] uppercase text-black/70 underline underline-offset-2 text-center hover:text-black mt-1"
               >
                 Actualiza a Premium →
               </button>
@@ -661,13 +662,13 @@ export const Home = () => {
         ))}
       </section>
 
-      <section className="mt-20 px-6 py-16 bg-black text-white text-center">
-        <h3 className="display-lg mb-6">DIAGNÓSTICO EMOCIONAL</h3>
-        <p className="body text-mid-gray mb-8 max-w-sm mx-auto">
+      <section className="mt-20 px-6 py-16 bg-[#CDBCDC] text-center">
+        <h3 className="display-lg mb-6 text-black">DIAGNÓSTICO EMOCIONAL</h3>
+        <p className="font-sans text-[14px] text-dark-gray mb-8 max-w-sm mx-auto leading-relaxed">
           Explora tu relación psicológica con la imagen a través de nuestro chatbot entrenado por Vane.
         </p>
         <NavLink to="/chat">
-          <Button className="bg-white text-black hover:bg-light-gray w-full max-w-xs mx-auto">
+          <Button variant="primary" className="w-full max-w-xs mx-auto">
             CHATEAR CON VANE AI
           </Button>
         </NavLink>
