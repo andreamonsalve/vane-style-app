@@ -363,12 +363,12 @@ export const Home = () => {
             </div>
           </motion.div>
 
-          {/* Tip del Día */}
+          {/* Consejo del Día */}
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.26 }}
-            className="bg-off-white border border-light-gray p-5"
+            className="w-[calc(100%+48px)] -ml-6 px-6 bg-[#1D1D1B] py-6 space-y-2"
           >
-            <p className="overline-text text-[9px] text-mid-gray tracking-[0.2em] mb-2">TIP DEL DÍA</p>
-            <p className="font-sans text-[13px] text-dark-gray leading-relaxed">{dailyTip}</p>
+            <p className="overline-text text-[10px] text-[#CDBCDC] tracking-[0.2em]">CONSEJO DEL DÍA</p>
+            <p className="font-sans text-[13px] text-[#FFFFFF] leading-relaxed">{dailyTip}</p>
           </motion.div>
 
           {/* Agendar con Vane — cards de servicios */}
@@ -556,10 +556,10 @@ export const Home = () => {
           {/* Consejo del día */}
           <motion.div
             initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.3 }}
-            className="bg-off-white border border-light-gray p-5 space-y-2"
+            className="w-[calc(100%+48px)] -ml-6 px-6 bg-[#1D1D1B] py-6 space-y-2"
           >
-            <p className="overline-text text-[9px] text-mid-gray tracking-[0.2em]">CONSEJO DEL DÍA</p>
-            <p className="font-sans text-[12px] text-black leading-relaxed">{getPersonalizedTip()}</p>
+            <p className="overline-text text-[10px] text-[#CDBCDC] tracking-[0.2em]">CONSEJO DEL DÍA</p>
+            <p className="font-sans text-[13px] text-[#FFFFFF] leading-relaxed">{getPersonalizedTip()}</p>
           </motion.div>
 
           {/* Agendar con Vane — cards de servicios */}
