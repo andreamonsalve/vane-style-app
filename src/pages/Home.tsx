@@ -507,7 +507,7 @@ export const Home = () => {
           {/* TU CLOSET — preview con prendas reales */}
           <motion.div
             initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.24 }}
-            className="bg-off-white border border-light-gray p-4 space-y-3"
+            className="space-y-3"
           >
             <div className="flex items-center justify-between">
               <p className="overline-text text-[9px] text-mid-gray tracking-[0.2em]">TU CLOSET</p>
@@ -534,7 +534,7 @@ export const Home = () => {
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-4 gap-[1px] bg-light-gray">
+              <div className="grid grid-cols-4 gap-[1px] bg-white">
                 {closetItems.map(item => (
                   <button
                     key={item.id}
